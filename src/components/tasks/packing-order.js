@@ -1,60 +1,23 @@
-import React from 'react';
-import {View, Text, Image, ScrollView} from 'react-native';
-import {useDispatch} from 'react-redux';
+import React, {useEffect} from 'react';
+import {Alert, ScrollView, Text} from 'react-native';
+import {useDispatch, useSelector} from 'react-redux';
 
+import Products from '@appComponents/tasks/products';
 import {AppBtn} from '@sharedComponents/theme';
 
-import {updateOrderProductStatus} from '@slices/orders';
+import {updateOrderProductStatus, getOrder, removeOrder} from '@slices/tasks';
 
 import {GenerateFilteredProducts} from '@helpers/order';
 
-import {productStatusTypes} from '@constants/order';
+import {bold, flex1, fRow, fs20, textC} from '@styles/global';
+import {white, green, disabledC} from '@styles/colors';
 
-import {flex1, fRow} from '@styles/global';
+const {emptyObj, emptyArr, pop} = global;
 
-const {emptyObj, emptyArr} = global;
-
-const {picked, missing} = productStatusTypes;
-
-const PackingOrder = ({state}) => {
+const PackingOrder = ({navigation, orderId}) => {
+  const order = useSelector(getOrder(orderId));
   const dispatch = useDispatch();
-  const {items = emptyArr, orderId} = state || emptyObj;
-
-  const onStatusChange = (productId, status) => {
-    dispatch(updateOrderProductStatus({orderId, productId, status}));
-  };
-
-  const renderProducts = (products, customStyle, disabled = false) => {
-    return products.map(({name, productId, img: uri}) => (
-      <View key={productId} style={customStyle}>
-        <View>
-          <Text>{name}</Text>
-          <Image
-            style={productImg}
-            source={{
-              uri,
-            }}
-          />
-        </View>
-        <View>
-          <AppBtn
-            style={markAsMissingS}
-            onPress={
-              disabled ? undefined : () => onStatusChange(productId, missing)
-            }>
-            <Text>Mark as missing</Text>
-          </AppBtn>
-          <AppBtn
-            style={pickedS}
-            onPress={
-              disabled ? undefined : () => onStatusChange(productId, picked)
-            }>
-            <Text>Picked</Text>
-          </AppBtn>
-        </View>
-      </View>
-    ));
-  };
+  const {items = emptyArr} = order || emptyObj;
 
   const {
     pickedProducts,
@@ -63,12 +26,58 @@ const PackingOrder = ({state}) => {
     outOfStockProducts,
   } = GenerateFilteredProducts(items);
 
+  useEffect(() => {
+    navigation.setParams({
+      title: `Items To Be Picked - ${items.length - pickedProducts.length}`,
+    });
+  }, [pickedProducts.length]);
+
+  const onSubmit = () => {
+    Alert.alert('Success', 'Task Completed', [
+      {
+        text: 'OK',
+        onPress: () => {
+          dispatch(removeOrder(orderId));
+          pop();
+        },
+      },
+    ]);
+  };
+
+  const onStatusChange = (productId, status) => {
+    dispatch(updateOrderProductStatus({orderId, productId, status}));
+  };
+
+  const allItemsPicked = items.length === pickedProducts.length;
+
   return (
     <ScrollView style={packingOrder}>
-      {renderProducts(notPickedProducts, notPickedProductsS)}
-      {renderProducts(missingProducts, missingProductsS)}
-      {renderProducts(pickedProducts, pickedProductsS)}
-      {renderProducts(outOfStockProducts, outOfStockProductsS, true)}
+      <Products
+        items={notPickedProducts}
+        customStyle={notPickedProductsS}
+        onStatusChange={onStatusChange}
+      />
+      <Products
+        items={missingProducts}
+        customStyle={missingProductsS}
+        onStatusChange={onStatusChange}
+      />
+      <Products
+        items={pickedProducts}
+        customStyle={pickedProductsS}
+        onStatusChange={onStatusChange}
+      />
+      <Products
+        items={outOfStockProducts}
+        customStyle={outOfStockProductsS}
+        onStatusChange={onStatusChange}
+        disabled
+      />
+      <AppBtn
+        onPress={onSubmit}
+        style={[submit, {backgroundColor: allItemsPicked ? green : disabledC}]}>
+        <Text style={submitText}>Submit</Text>
+      </AppBtn>
     </ScrollView>
   );
 };
@@ -76,6 +85,18 @@ const PackingOrder = ({state}) => {
 const packingOrder = {
   ...flex1,
   marginVertical: 15,
+};
+
+const submit = {
+  marginHorizontal: 10,
+  padding: 10,
+};
+
+const submitText = {
+  ...textC,
+  ...bold,
+  ...fs20,
+  color: white,
 };
 
 const product = {
@@ -104,23 +125,6 @@ const missingProductsS = {
 const outOfStockProductsS = {
   ...product,
   backgroundColor: 'grey',
-};
-
-const markAsMissingS = {
-  backgroundColor: 'yellow',
-  marginVertical: 5,
-  padding: 5,
-};
-
-const pickedS = {
-  backgroundColor: 'blue',
-  marginHorizontal: 5,
-  padding: 5,
-};
-
-const productImg = {
-  height: 80,
-  width: 80,
 };
 
 export default PackingOrder;

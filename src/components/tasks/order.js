@@ -4,6 +4,8 @@ import {useSelector} from 'react-redux';
 
 import {BoldText} from '@sharedComponents/theme';
 
+import {getOrder} from '@slices/tasks';
+
 import {packingOrder} from '@constants/routes';
 
 import {orderListing} from '@styles/colors';
@@ -16,8 +18,6 @@ const OrderInfo = ({label, content}) => (
   </Text>
 );
 
-const getOrder = id => state => state.orders[id];
-
 const Order = ({orderId}) => {
   const order = useSelector(getOrder(orderId));
 
@@ -29,7 +29,7 @@ const Order = ({orderId}) => {
     user: {name, address},
   } = order;
 
-  const onPress = () => push(packingOrder, {state: order});
+  const onPress = () => push(packingOrder, {orderId});
 
   return (
     <View style={orderWrapper}>

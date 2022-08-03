@@ -7,24 +7,34 @@ import {
   Alert,
   SafeAreaView,
 } from 'react-native';
+import {useDispatch} from 'react-redux';
+
+import {setLoggedIn, setUser} from '@slices/auth';
+
+import {fetchUser} from '@services/fakeData';
+
+import {flex1, flexC, fRow, textC} from '@styles/global';
+import {black, blue} from '@styles/colors';
 
 const inputs = new Array(6).fill('');
 const otp = [];
 
 const Index = () => {
   const [activeField, setActiveField] = useState(0);
+  const dispatch = useDispatch();
 
   const handleSubmit = () => {
     const enteredOtp = otp.join('');
 
-    const isOtpValid =
+    const isPinValid =
       enteredOtp.length === inputs.length &&
       otp.every(value => !!value.trim() && !isNaN(value));
 
-    if (isOtpValid) {
-      Alert.alert('OTP', `OTP entered is ${enteredOtp}`);
+    if (isPinValid) {
+      dispatch(setLoggedIn(true));
+      fetchUser().then(res => dispatch(setUser(res)));
     } else {
-      Alert.alert('OTP', 'Invalid OTP');
+      Alert.alert('PIN', 'Invalid PIN');
     }
   };
 
@@ -72,7 +82,7 @@ const Index = () => {
 
   return (
     <SafeAreaView style={container}>
-      <Text style={heading}>Enter OTP</Text>
+      <Text style={heading}>Enter Login PIN</Text>
       <View style={otpContainer}>{inputs.map(renderField)}</View>
     </SafeAreaView>
   );
@@ -80,34 +90,32 @@ const Index = () => {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    ...flex1,
+    ...flexC,
   },
   heading: {
     fontSize: 25,
     marginVertical: 20,
   },
   otpContainer: {
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderColor: '#000',
-    flexDirection: 'row',
+    ...flexC,
+    ...fRow,
+    borderColor: black,
   },
   fieldContainer: {
     marginHorizontal: 10,
   },
   activeFieldS: {
-    borderColor: 'blue',
+    borderColor: blue,
   },
   otpField: {
-    borderColor: '#000',
+    ...textC,
+    borderColor: black,
     borderWidth: 1,
     height: 50,
     width: 35,
     padding: 5,
-    textAlign: 'center',
-    color: '#000',
+    color: black,
   },
 });
 

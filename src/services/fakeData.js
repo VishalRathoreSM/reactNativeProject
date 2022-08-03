@@ -3,7 +3,7 @@ import {faker} from '@faker-js/faker';
 export const fetchAllOrders = async () => {
   let orders = [];
 
-  for (let id = 1; id <= 7; id++) {
+  for (let i = 1; i <= 7; i++) {
     let email = faker.internet.email();
     let address = faker.address.streetAddress();
     let name = faker.name.firstName();
@@ -52,4 +52,12 @@ export const fetchAllOrders = async () => {
   }
 
   return orders;
+};
+
+export const fetchUser = async () => {
+  let id = 'UId' + faker.random.numeric(5);
+  let name = faker.name.firstName();
+  let img = faker.image.people(150, 150);
+
+  return {id, name, img};
 };

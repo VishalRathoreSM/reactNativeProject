@@ -4,15 +4,13 @@ import {useDispatch, useSelector} from 'react-redux';
 
 import Order from '@appComponents/tasks/order';
 
-import {setOrders} from '@slices/orders';
+import {setOrders, getOrders} from '@slices/tasks';
 
 import {fetchAllOrders} from '@services/fakeData';
 
 import {GenerateOrders} from '@helpers/order';
 
 import {flex1} from '@styles/global';
-
-const getOrders = state => state.orders;
 
 const keyExtractor = item => item.orderId;
 

@@ -4,7 +4,8 @@ import {useDispatch} from 'react-redux';
 
 import {AppBtn} from '@sharedComponents/theme';
 
-import {setOrders} from '@slices/orders';
+import {setOrders} from '@slices/tasks';
+import {LogoutIcon} from '@sharedComponents/navbar';
 
 import {fetchAllOrders} from '@services/fakeData';
 
@@ -33,11 +34,15 @@ const activityIndicatorProps = {
   color: black,
 };
 
-const Index = () => {
+const Index = ({navigation}) => {
   const [isFetching, setIsFetching] = useState(true);
   const dispatch = useDispatch();
 
   useEffect(() => {
+    navigation.setParams({
+      right: <LogoutIcon dispatch={dispatch} />,
+    });
+
     fetchAllOrders()
       .then(res => {
         const orders = GenerateOrders(res);
