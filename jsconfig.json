@@ -1,0 +1,19 @@
+{
+  "compilerOptions": {
+    "baseUrl": "src/",
+    "paths": {
+      "@root/*": ["*"],
+      "@assets/*": ["assets/*"],
+      "@styles/*": ["assets/styles/*"],
+      "@constants/*": ["constants/*"],
+      "@services/*": ["services/*"],
+      "@helpers/*": ["helpers/*"],
+      "@store/*": ["store/*"],
+      "@slices/*": ["store/slices/*"],
+      "@appComponents/*": ["components/*"],
+      "@sharedComponents/*": ["components/shared/*"]
+    }
+  },
+  //Add any build/compiled folders here to stop vscode searching those
+  "exclude": ["node_modules", "build"]
+}
